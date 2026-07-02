@@ -1,12 +1,12 @@
 // ============================================================================
-// gandiva_branch.sv — conditional-branch comparator (shared leaf cell).
+// kavacha_branch.sv — conditional-branch comparator (shared leaf cell).
 // Given a decoded branch op and the two (already-forwarded) operands, decides
 // whether the branch is taken. Purely combinational.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
-module gandiva_branch
-  import gandiva_pkg::*;
+module kavacha_branch
+  import kavacha_pkg::*;
 (
   input  br_op_e          br_op,
   input  logic [XLEN-1:0] a,

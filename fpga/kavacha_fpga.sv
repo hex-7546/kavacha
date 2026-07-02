@@ -6,7 +6,7 @@
 //     data + stack, $readmemh-initialised from MEMFILE at synthesis. Distributed
 //     RAM keeps the zero-latency read the core expects (block RAM would need the
 //     mem_stall path); fine for a demo-sized image, bump MEM_WORDS as needed.
-//   * Real synthesizable UART (reused vajra_uart) @ 0x1000_0000.
+//   * Real synthesizable UART (synthesizable 8-N-1) @ 0x1000_0000.
 //   * 8 user LEDs @ 0x2000_1000; tohost @ 0x2000_0000 (sim/bring-up handshake).
 //   * Minimal CLINT (msip/mtime/mtimecmp) @ 0x0200_0000 for timer/soft IRQ.
 //   * RISC-V Debug Module + JTAG DTM (kavacha_debug) — drive from OpenOCD.
@@ -18,11 +18,11 @@
 //   0x2000_0000   : tohost
 //   0x2000_1000   : LED register (low 8 bits)
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 `default_nettype none
 
 module kavacha_fpga
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 #(
   parameter int CLK_HZ     = 50_000_000,
   parameter int UART_BAUD  = 115_200,
@@ -115,7 +115,7 @@ module kavacha_fpga
 
   // ---- UART ----------------------------------------------------------------
   wire [7:0] uart_rdata; wire uart_tx_irq, uart_rx_irq;
-  vajra_uart #(.CLK_HZ(CLK_HZ), .BAUD(UART_BAUD)) u_uart (
+  kavacha_uart #(.CLK_HZ(CLK_HZ), .BAUD(UART_BAUD)) u_uart (
     .clk(clk), .rst(rst), .addr(dmem_addr[3:0]), .wdata(dmem_wdata[7:0]),
     .we(dmem_we && uart_sel), .re(dmem_re && uart_sel), .rdata(uart_rdata),
     .serial_tx(serial_tx), .serial_rx(serial_rx),

@@ -1,10 +1,10 @@
 // ============================================================================
-// gandiva_alu.sv — Combinational RV32I ALU.
+// kavacha_alu.sv — Combinational RV32I ALU.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
-module gandiva_alu
-  import gandiva_pkg::*;
+module kavacha_alu
+  import kavacha_pkg::*;
 (
   input  alu_op_e          op,
   input  logic [XLEN-1:0]  a,

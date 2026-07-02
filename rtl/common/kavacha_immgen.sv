@@ -1,13 +1,13 @@
 // ============================================================================
-// gandiva_immgen.sv — RISC-V immediate generator (shared leaf cell).
+// kavacha_immgen.sv — RISC-V immediate generator (shared leaf cell).
 // Extracts the five immediate formats from a 32-bit instruction. Purely
 // combinational; reused by every AstraV core so the sign-extension logic lives
 // in exactly one place.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
-module gandiva_immgen
-  import gandiva_pkg::*;
+module kavacha_immgen
+  import kavacha_pkg::*;
 (
   input  logic [31:0] instr,
   output logic [XLEN-1:0] imm_i,   // I-type  (loads, OP-IMM, JALR)

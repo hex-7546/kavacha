@@ -1,10 +1,10 @@
 // ============================================================================
-// gandiva_rvc.sv — RV32C 16-bit → 32-bit instruction expander (combinational)
+// kavacha_rvc.sv — RV32C 16-bit → 32-bit instruction expander (combinational)
 // ============================================================================
 
 `default_nettype none
 
-module gandiva_rvc (
+module kavacha_rvc (
   input  logic [15:0] instr16,
   output logic [31:0] instr32,
   output logic        is_compressed,

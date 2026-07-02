@@ -9,11 +9,11 @@
 //
 // This lets the core talk a standard bus and drop into any AXI4-Lite fabric.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
 // ---------------------------------------------------------------------------
 module kavacha_axil_master
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 #( parameter logic [XLEN-1:0] RESET_PC = 32'h0 )
 ( input logic clk, rst,
   // AXI4-Lite master
@@ -76,7 +76,7 @@ endmodule
 
 // ---------------------------------------------------------------------------
 module axil_bram_slave
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 #( parameter int IMEM_WORDS=8192, parameter int DRAM_WORDS=8192,
    parameter logic [31:0] DRAM_BASE=32'h8000_0000, parameter logic [31:0] TOHOST=32'h2000_0000 )
 ( input logic clk, rst,
@@ -132,7 +132,7 @@ endmodule
 
 // ---------------------------------------------------------------------------
 module kavacha_axil_soc
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 ( input logic clk, rst, output logic [31:0] tohost, output logic tohost_we );
   logic [31:0] awaddr,wdata,araddr,rdata; logic [3:0] wstrb; logic [1:0] bresp,rresp;
   logic awvalid,awready,wvalid,wready,bvalid,bready,arvalid,arready,rvalid,rready;

@@ -5,10 +5,10 @@
 // Includes the RISC-V Debug Module + JTAG DTM (kavacha_debug). Drive the JTAG
 // pins from an external adapter (OpenOCD); tie tck/tms/tdi low if unused.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
 module kavacha_soc
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 #(
   parameter int unsigned IMEM_WORDS = 8192,
   parameter int unsigned DRAM_WORDS = 8192,

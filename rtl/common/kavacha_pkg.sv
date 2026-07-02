@@ -1,14 +1,14 @@
 // ============================================================================
-// gandiva_pkg.sv — Shared types & constants for the Gandiva RV32IM core.
+// kavacha_pkg.sv — Shared types & constants for the Kavacha RV32IMC core.
 //
-// Gandiva ("Arjuna's divine bow") is the clean, golden-co-simulated reference
-// member of the AstraV RISC-V family. RV32IM, 5-stage in-order, machine-mode.
-// Authored from scratch as the family's verified baseline.
+// Common datapath definitions used by the core and its leaf cells: XLEN,
+// opcode/funct encodings, the decoded control bundle, and the ALU / branch
+// operation selectors.
 // ============================================================================
-`ifndef GANDIVA_PKG_SV
-`define GANDIVA_PKG_SV
+`ifndef KAVACHA_PKG_SV
+`define KAVACHA_PKG_SV
 
-package gandiva_pkg;
+package kavacha_pkg;
 
   // ---- Word geometry -------------------------------------------------------
   localparam int unsigned XLEN = 32;
@@ -71,6 +71,6 @@ package gandiva_pkg;
   localparam logic [11:0] CSR_MARCHID  = 12'hF12;
   localparam logic [11:0] CSR_MHARTID  = 12'hF14;
 
-endpackage : gandiva_pkg
+endpackage : kavacha_pkg
 
 `endif

@@ -1,16 +1,14 @@
 // ============================================================================
-// gandiva_decode.sv — base RV32IM(C) instruction decoder (shared leaf cell).
+// kavacha_decode.sv — base RV32IM(C) instruction decoder (shared leaf cell).
 //
 // One combinational decode of the (already RVC-expanded) 32-bit instruction
-// into the family's control bundle + the selected immediate. This is the single
-// source of truth previously duplicated inline in every core; Kavacha, Takshaka
-// and Gandiva all instantiate it (Agni/Pinaka wrap it with their extension
-// decode). Behaviour is byte-identical to the original inline decoders.
+// into the control bundle + the selected immediate. This is the single source
+// of truth for instruction decoding, shared by the core and its leaf cells.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
-module gandiva_decode
-  import gandiva_pkg::*;
+module kavacha_decode
+  import kavacha_pkg::*;
 (
   input  logic [31:0]     instr,
   input  logic [XLEN-1:0] imm_i,

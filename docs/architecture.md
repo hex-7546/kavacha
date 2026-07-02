@@ -59,17 +59,17 @@ cells** kept under `rtl/common/`:
 
 | Cell | Role |
 |------|------|
-| `gandiva_pkg.sv` | shared types, opcodes, and parameters |
-| `gandiva_decode.sv` | instruction decoder |
-| `gandiva_rvc.sv` | 16-bit compressed → 32-bit expander |
-| `gandiva_immgen.sv` | immediate generation |
-| `gandiva_alu.sv` | arithmetic / logic / shift unit |
-| `gandiva_branch.sv` | branch condition evaluation |
-| `gandiva_muldiv.sv` | iterative multiply and divide |
-| `gandiva_regfile.sv` | 32 × 32-bit register file |
-| `gandiva_regfile_ecc.sv` | register file with SECDED ECC |
-| `gandiva_csr.sv` | machine/user CSR file with trap logic |
-| `gandiva_pmp.sv` | Physical Memory Protection checker |
+| `kavacha_pkg.sv` | shared types, opcodes, and parameters |
+| `kavacha_decode.sv` | instruction decoder |
+| `kavacha_rvc.sv` | 16-bit compressed → 32-bit expander |
+| `kavacha_immgen.sv` | immediate generation |
+| `kavacha_alu.sv` | arithmetic / logic / shift unit |
+| `kavacha_branch.sv` | branch condition evaluation |
+| `kavacha_muldiv.sv` | iterative multiply and divide |
+| `kavacha_regfile.sv` | 32 × 32-bit register file |
+| `kavacha_regfile_ecc.sv` | register file with SECDED ECC |
+| `kavacha_csr.sv` | machine/user CSR file with trap logic |
+| `kavacha_pmp.sv` | Physical Memory Protection checker |
 
 The core-specific logic — the control FSM, the memory sequencing, the debug
 hooks, and the SoC and bus wrappers — lives in the `kavacha_*` modules under

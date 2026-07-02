@@ -13,10 +13,10 @@
 //
 // Verified against the golden RV32IM ISA model.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
 module kavacha_core
-  import gandiva_pkg::*;
+  import kavacha_pkg::*;
 #(
   parameter logic [XLEN-1:0] RESET_PC = 32'h0000_0000,
   // SECURE=1 adds User mode + 8-region PMP for M/U memory isolation.
@@ -113,7 +113,7 @@ module kavacha_core
   wire [15:0] fetch_half = pc[1] ? imem_rdata[31:16] : imem_rdata[15:0];
   wire [31:0] c_instr32;
   wire        c_is_comp, c_illegal;
-  gandiva_rvc u_rvc (.instr16(fetch_half), .instr32(c_instr32),
+  kavacha_rvc u_rvc (.instr16(fetch_half), .instr32(c_instr32),
                      .is_compressed(c_is_comp), .decomp_illegal(c_illegal));
 
   // ---- instruction field wires (const selects only in continuous assigns) --
@@ -125,7 +125,7 @@ module kavacha_core
 
   // immediate generator (shared leaf cell)
   logic [XLEN-1:0] imm_i, imm_s, imm_b, imm_u, imm_j, id_imm;
-  gandiva_immgen u_imm (.instr(instr),
+  kavacha_immgen u_imm (.instr(instr),
     .imm_i(imm_i), .imm_s(imm_s), .imm_b(imm_b), .imm_u(imm_u), .imm_j(imm_j));
 
   // ---- register file -------------------------------------------------------
@@ -143,13 +143,13 @@ module kavacha_core
   // double-error-detect) for register-file hardening.
   wire ecc_cerr, ecc_uerr;
   generate if (SECURE) begin : g_rf_ecc
-    gandiva_regfile_ecc #(.WRITE_FIRST(0)) u_rf (
+    kavacha_regfile_ecc #(.WRITE_FIRST(0)) u_rf (
       .clk(clk), .ra1(rf_ra1), .ra2(rs2), .rd1(rdata1), .rd2(rdata2),
       .we(rf_we_eff), .wa(rf_wa), .wd(rf_wd),
       .ecc_cerr(ecc_cerr), .ecc_uerr(ecc_uerr)
     );
   end else begin : g_rf
-    gandiva_regfile #(.WRITE_FIRST(0)) u_rf (
+    kavacha_regfile #(.WRITE_FIRST(0)) u_rf (
       .clk(clk), .ra1(rf_ra1), .ra2(rs2), .rd1(rdata1), .rd2(rdata2),
       .we(rf_we_eff), .wa(rf_wa), .wd(rf_wd)
     );
@@ -164,7 +164,7 @@ module kavacha_core
   logic d_is_branch, d_is_jal, d_is_jalr, d_is_md, d_is_csr;
   logic d_is_ecall, d_is_ebreak, d_is_mret, d_illegal, d_uses_rs2;
 
-  gandiva_decode u_dec (
+  kavacha_decode u_dec (
     .instr(instr), .imm_i(imm_i), .imm_s(imm_s), .imm_b(imm_b),
     .imm_u(imm_u), .imm_j(imm_j),
     .alu_op(d_alu_op), .br_op(d_br_op), .md_op(d_md_op), .wb_sel(d_wb_sel),
@@ -180,14 +180,14 @@ module kavacha_core
   wire [XLEN-1:0] alu_a = d_use_pc  ? pc     : rdata1;
   wire [XLEN-1:0] alu_b = d_use_imm ? id_imm : rdata2;
   logic [XLEN-1:0] alu_y;
-  gandiva_alu u_alu (.op(d_alu_op), .a(alu_a), .b(alu_b), .y(alu_y));
+  kavacha_alu u_alu (.op(d_alu_op), .a(alu_a), .b(alu_b), .y(alu_y));
 
   logic br_taken;
-  gandiva_branch u_br (.br_op(d_br_op), .a(rdata1), .b(rdata2), .taken(br_taken));
+  kavacha_branch u_br (.br_op(d_br_op), .a(rdata1), .b(rdata2), .taken(br_taken));
 
   // multiply/divide
   logic md_busy, md_done; logic [XLEN-1:0] md_result;
-  gandiva_muldiv u_md (
+  kavacha_muldiv u_md (
     .clk(clk), .rst(rst), .start(state==S_EXEC && d_is_md),
     .op(d_md_op), .a(rdata1), .b(rdata2),
     .busy(md_busy), .done(md_done), .result(md_result)
@@ -220,12 +220,12 @@ module kavacha_core
   wire acc_fetch_fault, acc_load_fault, acc_store_fault;
   generate if (SECURE) begin : g_pmp
     wire pmp_fetch_fault, pmp_data_fault;
-    gandiva_pmp #(.NPMP(NPMP)) u_pmp_if (    // instruction-fetch check
+    kavacha_pmp #(.NPMP(NPMP)) u_pmp_if (    // instruction-fetch check
       .cfg(pmpcfg_w[8*NPMP-1:0]), .addrreg(pmpaddr_w[32*NPMP-1:0]),
       .addr(pc), .priv_m(fetch_m), .mmwp(mmwp_w), .do_r(1'b0), .do_w(1'b0), .do_x(1'b1),
       .fault(pmp_fetch_fault)
     );
-    gandiva_pmp #(.NPMP(NPMP)) u_pmp_ls (    // load/store check
+    kavacha_pmp #(.NPMP(NPMP)) u_pmp_ls (    // load/store check
       .cfg(pmpcfg_w[8*NPMP-1:0]), .addrreg(pmpaddr_w[32*NPMP-1:0]),
       .addr(alu_y), .priv_m(data_m), .mmwp(mmwp_w), .do_r(d_mem_re), .do_w(d_mem_we), .do_x(1'b0),
       .fault(pmp_data_fault)
@@ -279,7 +279,7 @@ module kavacha_core
   wire        csr_we_eff    = dbg_mode ? dbg_csr_we   : (commit && csr_do_write && !ex_trap);
   wire [XLEN-1:0] csr_wdata_eff = dbg_mode ? dbg_ar_wdata : csr_wval;
 
-  gandiva_csr #(.MISA_VAL((32'b01<<30)|(1<<8)|(1<<12)|(1<<2)),  // RV32IMC
+  kavacha_csr #(.MISA_VAL((32'b01<<30)|(1<<8)|(1<<12)|(1<<2)),  // RV32IMC
                 .U_MODE(SECURE), .PMP_REGIONS(SECURE ? NPMP : 0)) u_csr (  // secure opt
     .clk(clk), .rst(rst),
     .csr_addr(csr_addr_eff), .csr_rdata(csr_rdata),

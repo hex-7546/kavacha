@@ -1,5 +1,5 @@
 // ============================================================================
-// gandiva_muldiv.sv — RV32M multiply/divide unit (multi-cycle).
+// kavacha_muldiv.sv — RV32M multiply/divide unit (multi-cycle).
 //
 //   * MUL family : 1-cycle latched 64-bit product (picks hi/lo, signedness).
 //   * DIV family : iterative shift-subtract over magnitudes (32 steps) plus a
@@ -8,10 +8,10 @@
 // Handshake: pulse `start` for one cycle with op/a/b valid. `busy` stays high
 // while computing; `done` pulses for one cycle when `result` is valid.
 // ============================================================================
-`include "gandiva_pkg.sv"
+`include "kavacha_pkg.sv"
 
-module gandiva_muldiv
-  import gandiva_pkg::*;
+module kavacha_muldiv
+  import kavacha_pkg::*;
 (
   input  logic              clk,
   input  logic              rst,

@@ -15,9 +15,9 @@ $VVP = if ($env:VVP)      { $env:VVP }      else { "C:\iverilog\bin\vvp.exe" }
 $C = "rtl\common"
 $R = "rtl"
 $cells = @(
-  "$C\gandiva_pkg.sv","$C\gandiva_alu.sv","$C\gandiva_regfile.sv",
-  "$C\gandiva_muldiv.sv","$C\gandiva_csr.sv","$C\gandiva_rvc.sv",
-  "$C\gandiva_immgen.sv","$C\gandiva_branch.sv","$C\gandiva_decode.sv","$C\gandiva_pmp.sv"
+  "$C\kavacha_pkg.sv","$C\kavacha_alu.sv","$C\kavacha_regfile.sv",
+  "$C\kavacha_muldiv.sv","$C\kavacha_csr.sv","$C\kavacha_rvc.sv",
+  "$C\kavacha_immgen.sv","$C\kavacha_branch.sv","$C\kavacha_decode.sv","$C\kavacha_pmp.sv"
 )
 $core = @("$R\kavacha_core.sv","$R\kavacha_debug.sv","$R\kavacha_soc.sv")
 
@@ -30,7 +30,7 @@ New-Item -ItemType Directory -Force sim, programs\build | Out-Null
 
 if ($Action -eq "ecc") {
     Write-Host "Building register-file SECDED ECC unit test..."
-    & $IVL -g2012 -I $C -o sim\tb_regfile_ecc "$C\gandiva_pkg.sv" "$C\gandiva_regfile_ecc.sv" tb\tb_regfile_ecc.sv
+    & $IVL -g2012 -I $C -o sim\tb_regfile_ecc "$C\kavacha_pkg.sv" "$C\kavacha_regfile_ecc.sv" tb\tb_regfile_ecc.sv
     if ($LASTEXITCODE -ne 0) { throw "iverilog failed" }
     & $VVP sim\tb_regfile_ecc; return
 }
@@ -61,4 +61,12 @@ if ($Action -eq "debug") {
     & $IVL -g2012 -I $C -I $R -o sim\tb_kavacha_debug @cells @core tb\tb_kavacha_debug.sv
     if ($LASTEXITCODE -ne 0) { throw "iverilog failed" }
     & $VVP sim\tb_kavacha_debug +IMEM=programs\build\smoke.hex
+}
+if ($Action -eq "fpga") {
+    Write-Host "Building FPGA SoC sim (UART banner + LED blink)..."
+    & $IVL -g2012 -DSIMULATION -I $C -I $R -o sim\tb_kavacha_fpga `
+        @cells "$R\kavacha_core.sv" "$R\kavacha_debug.sv" `
+        fpga\common\kavacha_uart.sv fpga\kavacha_fpga.sv fpga\tb_kavacha_fpga.sv
+    if ($LASTEXITCODE -ne 0) { throw "iverilog failed" }
+    & $VVP sim\tb_kavacha_fpga
 }
