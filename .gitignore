@@ -1,0 +1,28 @@
+# simulation artifacts
+sim/
+programs/build/*.hex
+programs/build/*.bin
+programs/build/*.elf
+*.vcd
+*.out
+*.vvp
+
+# yosys / synthesis logs
+yosys*.log
+*.json
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# docs build
+site/
+.cache/
+
+# editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
