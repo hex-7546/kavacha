@@ -26,3 +26,10 @@ site/
 *.swp
 .DS_Store
 Thumbs.db
+
+#Python Virtual Environment
+venv/
+
+# Arty Build
+fpga/arty_a7/build
+fpga/arty_a7/vivado*

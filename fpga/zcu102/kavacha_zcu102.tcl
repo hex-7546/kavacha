@@ -24,6 +24,7 @@ close $fp
 read_xdc $fpga_dir/kavacha_zcu102.xdc
 set_property part $part [current_project]
 set_property top kavacha_zcu102 [current_fileset]
+set_property include_dirs [list [file normalize $fpga_dir/../../rtl/common]] [current_fileset]
 
 add_files -norecurse $build_dir/firmware.mem
 set_property file_type {Memory Initialization Files} [get_files firmware.mem]
