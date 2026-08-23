@@ -26,5 +26,5 @@ OUT="${1:-firmware.mem}"
 "$GCC" -march=rv32imc -mabi=ilp32 -nostdlib -nostartfiles -fno-pic \
        -Wl,--no-relax -T fpga_hello.ld fpga_hello.S -o fpga_hello.elf
 "$OBJCOPY" -O binary fpga_hello.elf fpga_hello.bin
-python bin2hex.py fpga_hello.bin "$OUT"
+python3 bin2hex.py fpga_hello.bin "$OUT"
 echo "wrote $OUT"

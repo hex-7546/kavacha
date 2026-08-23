@@ -2,7 +2,7 @@
 # ============================================================================
 # build.sh — build & run Kavacha under Icarus Verilog.
 #
-#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|ecc|fpga|clean]
+#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|ecc|fpga|bench|clean]
 #
 #   sim    (default) compile the core + SoC and run the self-checking smoke test
 #   cosim  run smoke, then co-simulate against the golden RV32IM ISA model
@@ -113,6 +113,21 @@ if [[ "$ACTION" == "debug" ]]; then
   "$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_kavacha_debug \
     $CELLS $CORE tb/tb_kavacha_debug.sv
   "$VVP" sim/tb_kavacha_debug +IMEM=programs/build/smoke.hex
+fi
+
+# ---- Verilator benchmark suite (CoreMark + EMBench-IoT) -------------------
+if [[ "$ACTION" == "bench" ]]; then
+  echo "Running Kavacha benchmark suite (CoreMark + EMBench-IoT)..."
+  echo "  Verilator model + 20 benchmarks will be compiled and simulated."
+  echo "  Results will appear in bench/results/report.md"
+  echo ""
+  if [[ -n "${RISCV_TC:-}" ]]; then
+    export PATH="$RISCV_TC:$PATH"
+  fi
+  make -C "$(dirname "$0")/bench" all \
+    ${ITERATIONS:+ITERATIONS="$ITERATIONS"} \
+    ${SCALE:+SCALE="$SCALE"}
+  exit 0
 fi
 
 # ---- FPGA SoC sim (UART banner + LED blink) -------------------------------
