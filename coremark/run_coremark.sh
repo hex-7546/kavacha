@@ -20,7 +20,7 @@ echo "========================================="
 rm -f build/coremark.hex build/coremark.elf
 
 # Build CoreMark (reduced iterations for fast sim)
-make coremark ITERATIONS=10
+make coremark ITERATIONS=10 RISCV_GCC=riscv-none-elf-gcc
 
 # Run simulation
 make run-kavacha-coremark TIMEOUT_CYCLES=50000000

@@ -4,7 +4,8 @@ set -e
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 KAVACHA_DIR="$(dirname "$SCRIPT_DIR")"
-export PATH="/usr/bin:$PATH"
+VERIF_TOOLS_DIR="$KAVACHA_DIR/verification/tools"
+export PATH="$VERIF_TOOLS_DIR/gcc/bin:/usr/bin:$PATH"
 
 cd "$KAVACHA_DIR/bench"
 
@@ -16,7 +17,7 @@ rm -f build/*.hex build/*.elf build/*.bin
 
 # Build all EMBench tests using the same compiler and flags as we did for CoreMark originally
 make embench \
-    RISCV_GCC="/usr/bin/riscv64-elf-gcc" \
+    RISCV_GCC="riscv-none-elf-gcc" \
     COMMON_CFLAGS="-march=rv32imc_zicsr -mabi=ilp32 -O2 -ffreestanding -ffunction-sections -fdata-sections -fno-builtin -fno-common -Wall -nostdlib -nostartfiles" \
     LDFLAGS="-T \$(BENCH_DIR)/common/bench.ld -Wl,--gc-sections"
 

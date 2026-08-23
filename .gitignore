@@ -33,3 +33,25 @@ venv/
 # Arty Build
 fpga/arty_a7/build
 fpga/arty_a7/vivado*
+
+# Vivado logs & backups everywhere
+vivado*.log
+vivado*.jou
+*.backup.log
+*.backup.jou
+.Xil/
+
+# Software & HIL build outputs
+sw/hil_build/
+sw/fpga_hello.bin
+sw/fpga_hello.elf
+sw/vivado*
+*.rpt
+
+# Bench build outputs
+bench/build/
+bench/results/
+bench/*.fst*
+bench/*.log
+bench/.venv/
+bench/venv/

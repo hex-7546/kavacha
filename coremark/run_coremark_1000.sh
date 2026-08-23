@@ -19,8 +19,8 @@ echo "========================================="
 # Clean previous builds
 rm -f build/coremark.hex build/coremark.elf
 
-# Build CoreMark (1000 iterations)
-make coremark ITERATIONS=1000
+# Build CoreMark (reduced iterations for fast sim)
+make coremark ITERATIONS=1000 RISCV_GCC=riscv-none-elf-gcc
 
 # Run simulation
 make run-kavacha-coremark TIMEOUT_CYCLES=5000000000

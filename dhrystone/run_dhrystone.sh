@@ -4,11 +4,20 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-GCC="/usr/bin/riscv64-elf-gcc"
-OBJCOPY="/usr/bin/riscv64-elf-objcopy"
+GCC_BIN="$ROOT/verification/tools/gcc/bin/riscv-none-elf-gcc"
+OBJCOPY_BIN="$ROOT/verification/tools/gcc/bin/riscv-none-elf-objcopy"
 
-if ! command -v $GCC &>/dev/null; then
-    echo "ERROR: GCC $GCC not found"
+if command -v "$GCC_BIN" &>/dev/null; then
+    GCC="$GCC_BIN"
+    OBJCOPY="$OBJCOPY_BIN"
+elif command -v riscv-none-elf-gcc &>/dev/null; then
+    GCC="riscv-none-elf-gcc"
+    OBJCOPY="riscv-none-elf-objcopy"
+elif command -v riscv64-elf-gcc &>/dev/null; then
+    GCC="riscv64-elf-gcc"
+    OBJCOPY="riscv64-elf-objcopy"
+else
+    echo "ERROR: RISC-V GCC not found."
     exit 1
 fi
 
@@ -52,6 +61,6 @@ echo "========================================="
 echo " Running Dhrystone Simulation            "
 echo "========================================="
 
-/tmp/kavacha_sim_yash/Vbench_obj/Vbench_top --hex build/dhrystone.hex --name dhrystone --max-cycles 500000000
+make -C "$ROOT/bench" run-kavacha-dhrystone HEX_FILE="$SCRIPT_DIR/build/dhrystone.hex" || true
 
 echo "Done."
