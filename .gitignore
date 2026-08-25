@@ -55,3 +55,6 @@ bench/*.fst*
 bench/*.log
 bench/.venv/
 bench/venv/
+
+# Verification toolchains and tools
+verification/tools/

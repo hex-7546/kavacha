@@ -86,9 +86,7 @@ BASE_CFLAGS=(
     -nostartfiles
 )
 
-if [[ "${PICORV32:-0}" == "1" ]]; then
-    BASE_CFLAGS+=("-DPICORV32")
-fi
+
 
 # Use the FPGA-specific linker script and startup
 LD_SCRIPT="$SW_DIR/fpga_bench.ld"

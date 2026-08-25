@@ -16,22 +16,14 @@ void* malloc(size_t size) {
 /* 2. Timer functions using RISC-V CSRs */
 long time(long* tloc) {
     uint32_t cycles;
-#ifdef PICORV32
-    __asm__ volatile ("csrr %0, cycle" : "=r" (cycles));
-#else
     __asm__ volatile ("csrr %0, mcycle" : "=r" (cycles));
-#endif
     if (tloc) *tloc = cycles;
     return cycles;
 }
 
 long insn(long* tloc) {
     uint32_t instret;
-#ifdef PICORV32
-    __asm__ volatile ("csrr %0, instret" : "=r" (instret));
-#else
     __asm__ volatile ("csrr %0, minstret" : "=r" (instret));
-#endif
     if (tloc) *tloc = instret;
     return instret;
 }

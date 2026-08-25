@@ -178,6 +178,7 @@ int main(int argc, char* argv[])
                 // Character output from _write (0x5C0000xx)
                 else if ((val & 0xFF000000u) == 0x5C000000u) {
                     putchar((char)(val & 0xFF));
+                    fflush(stdout);
                 }
                 // PASS
                 else if (val == 1u) {

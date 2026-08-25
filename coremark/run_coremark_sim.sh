@@ -14,16 +14,17 @@ cd "$KAVACHA_DIR/bench"
 
 echo "========================================="
 echo " Building and Running CoreMark Simulation"
+echo " (1,000 iterations: ~785M cycles, approx. 3–6 mins)"
 echo "========================================="
 
 # Clean previous builds
 rm -f build/coremark.hex build/coremark.elf
 
 # Build CoreMark (reduced iterations for fast sim)
-make coremark ITERATIONS=100 RISCV_GCC=riscv-none-elf-gcc
+make coremark ITERATIONS=1000 RISCV_GCC=riscv-none-elf-gcc
 
 # Run simulation
-make run-kavacha-coremark TIMEOUT_CYCLES=500000000
+make run-kavacha-coremark TIMEOUT_CYCLES=5000000000
 
 echo ""
 echo "========================================="

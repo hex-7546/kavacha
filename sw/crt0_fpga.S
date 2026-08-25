@@ -26,11 +26,9 @@
     .globl  _start
     .type   _start, @function
 _start:
-#ifndef PICORV32
     /* ---- set trap handler ------------------------------------------------- */
     la      t0, _trap_handler
     csrw    mtvec, t0
-#endif
 
     /* ---- set stack pointer ------------------------------------------------ */
     la      sp, _stack_top

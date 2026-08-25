@@ -12,6 +12,8 @@ This document outlines the environment, toolchain, and calculations used to run 
 ## Execution Parameters
 - **Iterations**: 1,000 (the standard industry benchmark length)
 - **Timeout**: 5,000,000,000 cycles (allows sufficient time for 1,000 iterations to complete in Verilator)
+- **Approximate Simulation Time**: ~3 to 6 minutes (~785M simulation cycles in Verilator)
+- **Fast Check**: For a quick sanity run, `run_coremark_10.sh` uses 10 iterations and takes ~2 to 5 seconds.
 
 ## Score Calculation
 The CoreMark/MHz metric is derived from the number of clock cycles required to complete the workload. 

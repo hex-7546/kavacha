@@ -4,10 +4,6 @@
  * CSR addresses used:
  *   0xB00  mcycle   — machine-mode cycle counter low 32 bits
  *   0xB80  mcycleh  — machine-mode cycle counter high 32 bits
- *
- * NOTE: Kavacha implements both 0xB00 (mcycle, M-mode) and 0xC00 (cycle,
- * user-mode alias).  PicoRV32 only implements 0xC00.  We use 0xC00 here so
- * the same firmware hex runs on both cores without recompilation.
  * ============================================================================ */
 
 #ifndef KAVACHA_IO_H
@@ -29,15 +25,9 @@ static inline void write_tohost(uint32_t val)
 static inline uint64_t read_mcycle64(void) {
     uint32_t lo, hi, hi_check;
     do {
-#ifdef PICORV32
-        __asm__ volatile ("csrr %0, cycleh" : "=r" (hi));
-        __asm__ volatile ("csrr %0, cycle"  : "=r" (lo));
-        __asm__ volatile ("csrr %0, cycleh" : "=r" (hi_check));
-#else
         __asm__ volatile ("csrr %0, mcycleh" : "=r" (hi));
         __asm__ volatile ("csrr %0, mcycle"  : "=r" (lo));
         __asm__ volatile ("csrr %0, mcycleh" : "=r" (hi_check));
-#endif
     } while (hi != hi_check);
     return ((uint64_t)hi << 32) | lo;
 }
@@ -58,17 +48,10 @@ static inline uint32_t read_mcycle(void)
  */
 static inline void report_cycles(uint64_t cycles)
 {
-#if defined(VEXRISCV) || defined(IBEX)
-    /* VexRiscv/Ibex external harnesses interpret ANY non-1 tohost write as
-     * FAIL, so skip the side-channel protocol.  The harness tracks
-     * sim_cycles itself, which is what we compare across cores. */
-    (void)cycles;
-#else
     uint32_t hi = (uint32_t)(cycles >> 30) & 0x3FFFFFFFu;
     uint32_t lo = (uint32_t)(cycles)       & 0x3FFFFFFFu;
     write_tohost(0xC0000000u | hi);
     write_tohost(0x80000000u | lo);
-#endif
 }
 
 #endif /* KAVACHA_IO_H */

@@ -14,6 +14,7 @@ cd "$KAVACHA_DIR/bench"
 
 echo "========================================="
 echo " Building and Running CoreMark Simulation"
+echo " (10 iterations: ~7.8M cycles, approx. 2–5 secs)"
 echo "========================================="
 
 # Clean previous builds

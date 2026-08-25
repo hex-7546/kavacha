@@ -28,15 +28,7 @@ extern char _end[];
 int _write(int fd, const char* buf, int len)
 {
     (void)fd;
-#if defined(VEXRISCV)
-    // VexRiscv's tohost intercepts all writes to 0x20000000 and kills the simulation.
-    // So we silently discard printf characters.
-#elif defined(IBEX)
-    // Ibex has a UART at 0x20000
-    volatile uint32_t* uart = (volatile uint32_t*)0x20000;
-    for (int i = 0; i < len; i++)
-        *uart = (unsigned char)buf[i];
-#elif defined(FPGA_UART)
+#if defined(FPGA_UART)
     // FPGA hardware UART is memory-mapped at 0x10000000
     volatile uint32_t* uart = (volatile uint32_t*)0x10000000;
     for (int i = 0; i < len; i++) {
