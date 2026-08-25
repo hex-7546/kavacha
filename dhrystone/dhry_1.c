@@ -148,9 +148,11 @@ main ()
   Begin_Time = (long) time_info.tms_utime;
 #endif
 #ifdef TIME
-  Begin_Time = time ( (long *) 0);
 #ifdef RISCV
-  Begin_Insn = insn ( (long *) 0);
+  Begin_Time = time((long *)0);
+  Begin_Insn = insn((long *)0);
+#else
+  Begin_Time = time ( (long *) 0);
 #endif
 #endif
 
@@ -209,9 +211,11 @@ main ()
   End_Time = (long) time_info.tms_utime;
 #endif
 #ifdef TIME
-  End_Time = time ( (long *) 0);
 #ifdef RISCV
-  End_Insn = insn ( (long *) 0);
+  End_Time = time((long *)0);
+  End_Insn = insn((long *)0);
+#else
+  End_Time = time ( (long *) 0);
 #endif
 #endif
 
@@ -274,25 +278,28 @@ main ()
   User_Insn = End_Insn - Begin_Insn;
 
   printf("Number_Of_Runs: %d\n", Number_Of_Runs);
-  printf("User_Time: %d cycles, %d insn\n", User_Time, User_Insn);
+  printf("User_Time: %ld cycles, %ld insn\n", User_Time, User_Insn);
   
   /* Output for Kavacha HIL parser */
   printf("BENCH:dhrystone\n");
-  printf("CYCLES:%d\n", User_Time);
+  printf("CYCLES:%ld\n", User_Time);
   printf("ITERS:%d\n", Number_Of_Runs);
   printf("RESULT:PASS\n");
   printf("EXIT:0\n");
 
-  int Cycles_Per_Instruction_x1000 = (1000 * User_Time) / User_Insn;
+  /* Use long long for intermediate products to avoid 32-bit overflow
+   * (e.g. 100000 * 1000000 = 10^11 > 2^31), then cast final result to
+   * int for printing — bare-metal printf.c does not support %%lld on RV32. */
+  int Cycles_Per_Instruction_x1000 = (int)((1000LL * (long long)User_Time) / (long long)User_Insn);
   printf("Cycles_Per_Instruction: %d.%d%d%d\n", Cycles_Per_Instruction_x1000 / 1000,
 		(Cycles_Per_Instruction_x1000 / 100) % 10,
 		(Cycles_Per_Instruction_x1000 / 10) % 10,
 		(Cycles_Per_Instruction_x1000 / 1) % 10);
 
-  int Dhrystones_Per_Second_Per_MHz = (Number_Of_Runs * 1000000) / User_Time;
+  int Dhrystones_Per_Second_Per_MHz = (int)(((long long)Number_Of_Runs * 1000000LL) / (long long)User_Time);
   printf("Dhrystones_Per_Second_Per_MHz: %d\n", Dhrystones_Per_Second_Per_MHz);
 
-  int DMIPS_Per_MHz_x1000 = (1000 * Dhrystones_Per_Second_Per_MHz) / 1757;
+  int DMIPS_Per_MHz_x1000 = (int)((1000LL * Dhrystones_Per_Second_Per_MHz) / 1757LL);
   printf("DMIPS_Per_MHz: %d.%d%d%d\n", DMIPS_Per_MHz_x1000 / 1000,
 		(DMIPS_Per_MHz_x1000 / 100) % 10,
 		(DMIPS_Per_MHz_x1000 / 10) % 10,

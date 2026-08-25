@@ -109,11 +109,24 @@ MAX_BYTES=$(( 128 * 1024 ))
 # ---------------------------------------------------------------------------
 # Helper: compile → ELF → BIN → MEM, check size
 #   build_image <name> <extra_cflags_array_name> <srcs...>
+#   build_image <name> <extra_cflags_array_name> --libs <lib...> -- <srcs...>
 # ---------------------------------------------------------------------------
 build_image() {
     local name="$1"
     local -n _extra_flags="$2"   # nameref to caller's extra-flags array
     shift 2
+
+    # Optional: parse --libs <lib...> -- <srcs...>
+    local link_libs=()
+    if [[ "${1:-}" == "--libs" ]]; then
+        shift
+        while [[ $# -gt 0 && "$1" != "--" ]]; do
+            link_libs+=("$1")
+            shift
+        done
+        [[ "${1:-}" == "--" ]] && shift
+    fi
+
     local srcs=("$@")
 
     local elf="$OUT_DIR/${name}.elf"
@@ -127,7 +140,8 @@ build_image() {
         "${BASE_LDFLAGS[@]}" \
         -Wl,-Map="$OUT_DIR/${name}.map" \
         -o "$elf" \
-        "${srcs[@]}"
+        "${srcs[@]}" \
+        "${link_libs[@]+${link_libs[@]}}"
 
     "$OBJCOPY" -O binary "$elf" "$bin"
     python3 "$SW_DIR/bin2hex.py" "$bin" "$mem"
@@ -193,7 +207,7 @@ build_coremark() {
 # Dhrystone
 # ---------------------------------------------------------------------------
 build_dhrystone() {
-    local DHRY_SRC="$ROOT/dhrystone_sim"
+    local DHRY_SRC="$ROOT/dhrystone"
     if [[ ! -d "$DHRY_SRC" ]]; then
         echo "ERROR: Dhrystone source not found at $DHRY_SRC"
         exit 1
@@ -222,7 +236,9 @@ build_dhrystone() {
         -Wno-implicit-function-declaration
     )
 
-    build_image "dhrystone" extra_flags "${srcs[@]}"
+    # Pass -lgcc AFTER sources so the linker can resolve __divdi3
+    # (used for 64-bit integer division in the metric output)
+    build_image "dhrystone" extra_flags --libs -lgcc -- "${srcs[@]}"
 }
 
 # ---------------------------------------------------------------------------

@@ -47,8 +47,8 @@ SRCS=(
     "dhry_2.c"
 )
 
-# Compile
-$GCC $COMMON_CFLAGS $INCLUDES $DHRY_CFLAGS -T ../bench/common/bench.ld -Wl,--gc-sections -o build/dhrystone.elf "${SRCS[@]}"
+# Compile (link libgcc for 64-bit division support, e.g. __divdi3 on RV32)
+$GCC $COMMON_CFLAGS $INCLUDES $DHRY_CFLAGS -T ../bench/common/bench.ld -Wl,--gc-sections -o build/dhrystone.elf "${SRCS[@]}" -lgcc
 
 # Convert to hex
 $OBJCOPY -O binary build/dhrystone.elf build/dhrystone.bin
@@ -61,6 +61,7 @@ echo "========================================="
 echo " Running Dhrystone Simulation            "
 echo "========================================="
 
-make -C "$ROOT/bench" run-kavacha-dhrystone HEX_FILE="$SCRIPT_DIR/build/dhrystone.hex" || true
+make -C "$ROOT/bench" run-kavacha-dhrystone HEX_FILE="$SCRIPT_DIR/build/dhrystone.hex" TIMEOUT_CYCLES=300000000 || true
 
 echo "Done."
+

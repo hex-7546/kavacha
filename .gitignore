@@ -58,3 +58,14 @@ bench/venv/
 
 # Verification toolchains and tools
 verification/tools/
+
+# dhrystone build
+dhrystone/build/
+
+# firmware
+sw/firmware.mem
+
+# test benchmarks
+benchmarks/coremark_sim.log
+benchmarks/embench_sim.log
+

@@ -90,6 +90,10 @@ SCALE_nsichneu    := 10
 SCALE_qrduino     := 10
 SCALE_wikisort    := 10
 
+# wikisort uses bool/true/false without #include <stdbool.h>.
+# Force-include it to fix the build without patching upstream source.
+EXTRA_CFLAGS_wikisort := -include stdbool.h
+
 scale_for = $(if $(SCALE_$(1)),$(SCALE_$(1)),$(SCALE))
 
 # ---- EMBench benchmark list (all 20 from embench-iot) ----------------------
@@ -241,7 +245,8 @@ EMBENCH_CFLAGS_$(1) := $$(COMMON_CFLAGS) \
     -I$$(EMBENCH_SRC)/src/$(1) \
     -DLOCAL_SCALE_FACTOR=$$(call scale_for,$(1)) \
     -DGLOBAL_SCALE_FACTOR=1 \
-    -DBENCHMARK_NAME='"$(1)"'
+    -DBENCHMARK_NAME='"$(1)"' \
+    $$(EXTRA_CFLAGS_$(1))
 
 $$(EMBENCH_ELF_$(1)): $$(COMMON_SRCS) $$(CRT0) \
                        $$(BENCH_DIR)/embench/bench_main.c \
@@ -286,6 +291,18 @@ run-kavacha-embench: $(SIM_BIN) embench | $(KAVACHA_RESULTS) $(RESULTS_DIR)
 	        --max-cycles $(TIMEOUT_CYCLES) \
 	        | tee $(KAVACHA_RESULTS)/$$b.log; \
 	done
+
+DHRYSTONE_HEX ?= $(ROOT_DIR)/dhrystone/build/dhrystone.hex
+
+.PHONY: run-dhrystone run-kavacha-dhrystone
+run-dhrystone: run-kavacha-dhrystone
+run-kavacha-dhrystone: $(SIM_BIN) | $(KAVACHA_RESULTS) $(RESULTS_DIR)
+	@HEX=$${HEX_FILE:-$(DHRYSTONE_HEX)}; \
+	echo "[RUN/Kavacha] Dhrystone ($$HEX)..."; \
+	$(SIM_BIN) --hex "$$HEX" --name dhrystone \
+	    --max-cycles $(TIMEOUT_CYCLES) \
+	    | tee $(KAVACHA_RESULTS)/dhrystone.log
+
 
 .PHONY: run-kavacha run-all
 run-kavacha: run-kavacha-coremark run-kavacha-embench

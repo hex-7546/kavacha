@@ -5,7 +5,22 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 KAVACHA_DIR="$(dirname "$SCRIPT_DIR")"
 VERIF_TOOLS_DIR="$KAVACHA_DIR/verification/tools"
-export PATH="$VERIF_TOOLS_DIR/gcc/bin:/usr/bin:$PATH"
+
+# Add bundled tools to PATH (if present); fall back to system toolchain
+export PATH="$VERIF_TOOLS_DIR/gcc/bin:$PATH"
+
+# Detect RISC-V GCC (same fallback chain as dhrystone/run_dhrystone.sh)
+if command -v riscv-none-elf-gcc &>/dev/null; then
+    RISCV_GCC="riscv-none-elf-gcc"
+elif command -v riscv64-elf-gcc &>/dev/null; then
+    RISCV_GCC="riscv64-elf-gcc"
+elif command -v riscv64-unknown-elf-gcc &>/dev/null; then
+    RISCV_GCC="riscv64-unknown-elf-gcc"
+else
+    echo "ERROR: No RISC-V GCC found. Install riscv-none-elf-gcc or riscv64-elf-gcc."
+    exit 1
+fi
+echo "[BUILD] Toolchain: $RISCV_GCC"
 
 cd "$KAVACHA_DIR/bench"
 
@@ -17,7 +32,7 @@ rm -f build/*.hex build/*.elf build/*.bin
 
 # Build all EMBench tests using the same compiler and flags as we did for CoreMark originally
 make embench \
-    RISCV_GCC="riscv-none-elf-gcc" \
+    RISCV_GCC="$RISCV_GCC" \
     COMMON_CFLAGS="-march=rv32imc_zicsr -mabi=ilp32 -O2 -ffreestanding -ffunction-sections -fdata-sections -fno-builtin -fno-common -Wall -nostdlib -nostartfiles" \
     LDFLAGS="-T \$(BENCH_DIR)/common/bench.ld -Wl,--gc-sections"
 
@@ -29,10 +44,18 @@ mkdir -p results/kavacha/embench_O2
 
 BENCHMARKS="aha-mont64 crc32 depthconv edn huffbench matmult-int md5sum nettle-aes nettle-sha256 nsichneu picojpeg qrduino sglib-combined slre statemate tarfind ud wikisort xgboost"
 
+# Portable path to the Verilator simulation binary (mirrors bench/Makefile V_BUILD_DIR)
+SIM_BIN="/tmp/kavacha_sim_${USER}/Vbench_obj/Vbench_top"
+if [[ ! -x "$SIM_BIN" ]]; then
+    echo "ERROR: Verilator simulation binary not found at $SIM_BIN"
+    echo "       Build it first with: make -C bench verilator-kavacha"
+    exit 1
+fi
+
 # Start all simulations in parallel in the background
 for b in $BENCHMARKS; do
     (
-        /tmp/kavacha_sim_yash/Vbench_obj/Vbench_top --hex build/$b.hex --name $b --max-cycles 2000000000 > results/kavacha/embench_O2/$b.log 2>&1
+        "$SIM_BIN" --hex build/$b.hex --name $b --max-cycles 2000000000 > results/kavacha/embench_O2/$b.log 2>&1
         
         # Check if it passed
         if grep -q "PASS" results/kavacha/embench_O2/$b.log; then
